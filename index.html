@@ -1,0 +1,371 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ماشین حساب ریسک</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;700&display=swap');
+
+        body {
+            font-family: 'Montserrat', Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #2d2d2d, #000000);
+        }
+        .container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            width: 100%;
+            max-width: 450px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        h1 {
+            text-align: center;
+            font-size: 2em;
+            font-weight: 700;
+            color: #d4af37;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+            animation: fade-in 1s ease-in-out;
+            margin-bottom: 25px;
+        }
+        @keyframes fade-in {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .about-btn {
+            display: block;
+            text-align: center;
+            margin-top: 20px;
+            padding: 6px;
+            background: linear-gradient(45deg, #d4af37, #b8860b);
+            color: #ffffff;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .about-btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(12px);
+            padding: 8px;
+            border-radius: 8px;
+            text-align: center;
+            max-width: 100px;
+            width: 90%;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            animation: modal-fade 0.5s ease-in-out;
+        }
+        @keyframes modal-fade {
+            from { opacity: 0; transform: scale(0.8); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        .modal-content h2 {
+            color: #d4af37;
+            font-size: 0.8em;
+            font-weight: 700;
+            margin-bottom: 6px;
+        }
+        .modal-content p {
+            color: #e0e0e0;
+            font-size: 0.6em;
+            margin: 4px 0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+        }
+        .modal-content p span {
+            color: #d4af37;
+            font-weight: 700;
+        }
+        .close-btn {
+            margin-top: 8px;
+            padding: 5px 10px;
+            background: linear-gradient(45deg, #e57373, #b71c1c);
+            color: #ffffff;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.7em;
+            font-weight: 700;
+            transition: transform 0.2s;
+        }
+        .close-btn:hover {
+            transform: scale(1.05);
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+            font-size: 1.1em;
+            color: #e0e0e0;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transition: transform 0.3s;
+        }
+        label:hover {
+            transform: scale(1.02);
+        }
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            color: #e0e0e0;
+            font-size: 1em;
+            font-weight: 400;
+            transition: border-color 0.3s, background 0.3s;
+            box-sizing: border-box;
+        }
+        input:focus {
+            outline: none;
+            border-color: #d4af37;
+            background: rgba(255, 255, 255, 0.15);
+        }
+        input::placeholder {
+            color: #b0b0b0;
+        }
+        .button-group {
+            display: flex;
+            gap: 15px;
+        }
+        button {
+            flex: 1;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1.1em;
+            font-weight: 700;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        button:hover {
+            transform: scale(1.05);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4);
+        }
+        #calculateBtn {
+            background: linear-gradient(45deg, #d4af37, #b8860b);
+            color: #ffffff;
+        }
+        #clearBtn {
+            background: linear-gradient(45deg, #e57373, #b71c1c);
+            color: #ffffff;
+        }
+        #result {
+            margin-top: 25px;
+            text-align: center;
+            font-weight: 500;
+            font-size: 1.4em;
+            color: #d4af37;
+            text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            display: none;
+            opacity: 0;
+            transition: opacity 0.5s ease-in;
+        }
+        #result.show {
+            display: block;
+            opacity: 1;
+        }
+        .error {
+            color: #e57373;
+            font-size: 0.9em;
+            font-weight: 500;
+            margin-top: 5px;
+            display: none;
+            text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+            transition: opacity 0.3s;
+        }
+        .error.show {
+            display: block;
+            opacity: 1;
+        }
+        @media (max-width: 600px) {
+            .container {
+                margin: 15px;
+                padding: 20px;
+            }
+            h1 {
+                font-size: 1.5em;
+            }
+            .about-btn {
+                font-size: 0.7em;
+                padding: 5px;
+            }
+            .modal-content {
+                padding: 8px;
+            }
+            .modal-content h2 {
+                font-size: 0.7em;
+            }
+            .modal-content p {
+                font-size: 0.5em;
+            }
+            button {
+                font-size: 1em;
+            }
+            input {
+                font-size: 0.9em;
+            }
+            #result {
+                font-size: 1.2em;
+            }
+            label {
+                font-size: 1em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>ماشین حساب ریسک</h1>
+        <div class="form-group">
+            <label for="entryPoint">نقطه ورود</label>
+            <input type="number" id="entryPoint" step="any" placeholder="">
+            <div id="entryPointError" class="error">لطفاً یک عدد معتبر وارد کنید</div>
+        </div>
+        <div class="form-group">
+            <label for="stopPoint">نقطه توقف</label>
+            <input type="number" id="stopPoint" step="any" placeholder="">
+            <div id="stopPointError" class="error">لطفاً یک عدد معتبر وارد کنید</div>
+        </div>
+        <div class="form-group">
+            <label for="risk">ریسک</label>
+            <input type="number" id="risk" step="any" placeholder="">
+            <div id="riskError" class="error">لطفاً یک عدد غیرصفر وارد کنید</div>
+        </div>
+        <div class="form-group">
+            <label for="leverage">اهرم</label>
+            <input type="number" id="leverage" step="any" placeholder="">
+            <div id="leverageError" class="error">لطفاً یک عدد غیرصفر وارد کنید</div>
+        </div>
+        <div class="button-group">
+            <button id="calculateBtn">محاسبه</button>
+            <button id="clearBtn">پاک کردن</button>
+        </div>
+        <div id="result"></div>
+        <div class="about-btn" onclick="showModal()">درباره</div>
+    </div>
+
+    <div class="modal" id="aboutModal">
+        <div class="modal-content">
+            <h2>درباره</h2>
+            <p>توسعه‌دهنده: <span>ataolla_h</span></p>
+            <p>ایده‌پرداز: <span>alisabry</span></p>
+            <button class="close-btn" onclick="hideModal()">بستن</button>
+        </div>
+    </div>
+
+    <script>
+        const entryPoint = document.getElementById('entryPoint');
+        const stopPoint = document.getElementById('stopPoint');
+        const risk = document.getElementById('risk');
+        const leverage = document.getElementById('leverage');
+        const calculateBtn = document.getElementById('calculateBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const resultDiv = document.getElementById('result');
+        const aboutModal = document.getElementById('aboutModal');
+
+        function validateInputs() {
+            let isValid = true;
+            const inputs = [
+                { field: entryPoint, error: 'entryPointError' },
+                { field: stopPoint, error: 'stopPointError' },
+                { field: risk, error: 'riskError' },
+                { field: leverage, error: 'leverageError' }
+            ];
+
+            inputs.forEach(({ field, error }) => {
+                const errorElement = document.getElementById(error);
+                if (field.value.trim() === '' || isNaN(field.value)) {
+                    errorElement.classList.add('show');
+                    isValid = false;
+                } else {
+                    errorElement.classList.remove('show');
+                }
+                if ((field === risk || field === leverage) && parseFloat(field.value) === 0) {
+                    errorElement.textContent = 'لطفاً یک عدد غیرصفر وارد کنید';
+                    errorElement.classList.add('show');
+                    isValid = false;
+                }
+            });
+
+            return isValid;
+        }
+
+        function calculateRiskManagement() {
+            if (!validateInputs()) return;
+
+            const entry = parseFloat(entryPoint.value);
+            const stop = parseFloat(stopPoint.value);
+            const riskValue = parseFloat(risk.value);
+            const leverageValue = parseFloat(leverage.value);
+
+            const difference = Math.abs(entry - stop);
+            if (difference === 0) {
+                resultDiv.textContent = 'لطفاً مقادیر معتبر وارد کنید';
+                resultDiv.classList.add('show');
+                return;
+            }
+
+            const step1 = riskValue / difference;
+            const step2 = step1 * entry;
+            const result = step2 / leverageValue;
+
+            resultDiv.textContent = `نتیجه: ${result.toFixed(4)}`;
+            resultDiv.classList.add('show');
+        }
+
+        function clearForm() {
+            entryPoint.value = '';
+            stopPoint.value = '';
+            risk.value = '';
+            leverage.value = '';
+            resultDiv.classList.remove('show');
+            ['entryPointError', 'stopPointError', 'riskError', 'leverageError'].forEach(id => {
+                document.getElementById(id).classList.remove('show');
+            });
+        }
+
+        function showModal() {
+            aboutModal.style.display = 'flex';
+        }
+
+        function hideModal() {
+            aboutModal.style.display = 'none';
+        }
+
+        aboutModal.addEventListener('click', (e) => {
+            if (e.target === aboutModal) {
+                hideModal();
+            }
+        });
+
+        calculateBtn.addEventListener('click', calculateRiskManagement);
+        clearBtn.addEventListener('click', clearForm);
+    </script>
+</body>
+</html>
